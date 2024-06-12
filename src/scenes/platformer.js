@@ -5,13 +5,12 @@ class Platformer extends Phaser.Scene {
 
     init() {
         // variables and settings
-        this.ACCELERATION = 300;
-        this.DRAG = 300;    // DRAG < ACCELERATION = icy slide
+        this.ACCELERATION = 400;
+        this.DRAG = 800;    // DRAG < ACCELERATION = icy slide
         this.physics.world.gravity.y = 1400;
         this.JUMP_VELOCITY = -600;
         this.PARTICLE_VELOCITY = 10;
         this.SCALE = 2.0;   
-
     }
 
     create() {
@@ -24,8 +23,8 @@ class Platformer extends Phaser.Scene {
         this.map = this.add.tilemap("platformer-level-1", 18, 18, 45, 25);
         
         // load out
-        this.coinText = this.add.text(this.cameras.main.scrollX + 10, this.cameras.main.scrollY + 60, 'Coins: 0', { fontSize: '10px', fill: '#4169E1' });
-        //this.coinText.setScrollFactor(0); 
+        this.coinText = this.add.text(this.cameras.main.scrollX + 10, this.cameras.main.scrollY + 70, 'Coins: 0', { fontSize: '10px', fill: '#4169E1' });
+        //this.coinText.setScrollFactor(0);
         this.mushroomText = this.add.text(this.cameras.main.scrollX + 10, this.cameras.main.scrollY + 75, 'Mushrooms: 0', { fontSize: '10px', fill: '#4169E1' });
         //this.mushroomText.setScrollFactor(0); 
         this.coinText.setDepth(100);
@@ -33,7 +32,7 @@ class Platformer extends Phaser.Scene {
 
         // load sound 
         this.collectSound = this.sound.add('collectSound', { volume: 0.5 });
-        
+    
         // Add a tileset to the map
         // First parameter: name we gave the tileset in Tiled
         // Second parameter: key for the tilesheet (from this.load.image in Load.js)
@@ -70,9 +69,15 @@ class Platformer extends Phaser.Scene {
         this.enemy.setVelocityX(100);  // Initial horizontal velocity
         this.enemy.body.maxVelocity.x = 100;  // Max horizontal velocity
 
-        // Define movement boundaries for the enemy
-        this.enemy.minX = 800;  // Minimum x position
-        this.enemy.maxX = 1000; // Maximum x position
+        // Define movement boundaries for the enemy based on a 50 pixels range
+        this.enemy.minX = this.enemy.x - 50;  // Minimum x position
+        this.enemy.maxTime = this.enemy.x + 50; // Maximum x position
+
+        // Collider with ground
+        this.physics.add.collider(this.enemy, this.groundLayer);
+
+        // Collider with player that triggers game over
+        this.physics.add.collider(this.enemy, my.sprite.player, this.gameOver, null, this);
 
         // Collider with ground
         this.physics.add.collider(this.enemy, this.groundLayer);
@@ -115,7 +120,7 @@ class Platformer extends Phaser.Scene {
             this.mushroomsCollected += 1;  // Correctly increment the count
             this.mushroomText.setText('Mushrooms: ' + this.mushroomsCollected);  // Update the display text
             this.collectSound.play();
-            if (this.mushroomsCollected >= 13) {  // Check if 10 mushrooms have been collected
+            if (this.mushroomsCollected >= 3) {  // Check if all 3 mushrooms have been collected
                 this.winGame();  // Trigger the win condition
             }
         });
@@ -173,7 +178,7 @@ class Platformer extends Phaser.Scene {
         this.rKey.on('down', () => {
             this.scene.restart(); // Restart the scene
         });
-    }
+    }    
 
     update() {
 
@@ -229,6 +234,11 @@ class Platformer extends Phaser.Scene {
 
         if(Phaser.Input.Keyboard.JustDown(this.rKey)) {
             this.scene.restart();
+        }
+
+        // Check if the enemy has reached the defined boundaries
+        if (this.enemy.x >= this.enemy.maxX || this.enemy.x <= this.enemy.minX) {
+            this.enemy.setVelocityX(-this.enemy.body.velocity.x); // Reverse the movement direction
         }
     }
     

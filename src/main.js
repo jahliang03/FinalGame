@@ -17,10 +17,10 @@ let config = {
             }
         }
     },
-    width: 1200,
-    height: 800,
+    width: 1000,
+    height: 700,
     backgroundColor: '#F0FFFF',
-    scene: [Load, Platformer]
+    scene: [TitleScene, Load, Platformer]
 }
 
 var cursors;
