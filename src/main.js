@@ -19,8 +19,8 @@ let config = {
     },
     width: 1000,
     height: 700,
-    backgroundColor: '#F0FFFF',
-    scene: [TitleScene, Load, Platformer]
+    backgroundColor: '#9BF0FF',
+    scene: [TitleScene, Load, Platformer, WinScene]
 }
 
 var cursors;

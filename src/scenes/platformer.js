@@ -11,6 +11,9 @@ class Platformer extends Phaser.Scene {
         this.JUMP_VELOCITY = -600;
         this.PARTICLE_VELOCITY = 10;
         this.SCALE = 2.0;   
+
+        this.ENEMY_SPEED = 100;
+        this.ENEMY_PATROL_DISTANCE = 200;
     }
 
     create() {
@@ -22,22 +25,15 @@ class Platformer extends Phaser.Scene {
         // 45 tiles wide and 25 tiles tall.
         this.map = this.add.tilemap("platformer-level-1", 18, 18, 45, 25);
         
-        // load out
-        this.coinText = this.add.text(this.cameras.main.scrollX + 10, this.cameras.main.scrollY + 70, 'Coins: 0', { fontSize: '10px', fill: '#4169E1' });
-        //this.coinText.setScrollFactor(0);
-        this.mushroomText = this.add.text(this.cameras.main.scrollX + 10, this.cameras.main.scrollY + 75, 'Mushrooms: 0', { fontSize: '10px', fill: '#4169E1' });
-        //this.mushroomText.setScrollFactor(0); 
-        this.coinText.setDepth(100);
-        this.mushroomText.setDepth(100);
-
         // load sound 
         this.collectSound = this.sound.add('collectSound', { volume: 0.5 });
-    
+        this.backgroundMusic = this.sound.add('backgroundMusic', { volume: 0.3 });
+        this.backgroundMusic.play(); 
         // Add a tileset to the map
         // First parameter: name we gave the tileset in Tiled
         // Second parameter: key for the tilesheet (from this.load.image in Load.js)
         this.tileset = this.map.addTilesetImage("kenny_tilemap_packed", "tilemap_tiles");
-        this.farmset = this.map.addTilesetImage("kenny_tilemap_packed_farm", "tilemap_tiles");
+       
         // Create a layer
         this.groundLayer = this.map.createLayer("Ground-n-Platforms", this.tileset, 0, 0);
     
@@ -50,7 +46,9 @@ class Platformer extends Phaser.Scene {
         // Find coins in the "Objects" layer in Phaser
         this.coinsCollected = 0; 
         this.mushroomsCollected = 0; 
+        this.saplingsCollected = 0; 
 
+        //create coin and mushroom objects
         this.coins = this.map.createFromObjects("Objects", {
             name: "coin",
             key: "tilemap_sheet",
@@ -61,6 +59,12 @@ class Platformer extends Phaser.Scene {
             name: "mushroom",
             key: "tilemap_sheet",
             frame: 128
+        });
+
+        this.sapling = this.map.createFromObjects("sapling", {
+            name: "sapling",
+            key: "tilemap_sheet",
+            frame: 124
         });
 
         // Enemy setup
@@ -91,12 +95,14 @@ class Platformer extends Phaser.Scene {
         this.physics.world.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
 
         this.physics.world.enable(this.mushrooms, Phaser.Physics.Arcade.STATIC_BODY);
+        this.physics.world.enable(this.sapling, Phaser.Physics.Arcade.STATIC_BODY);
         
         // Create a Phaser group out of the array this.coins
         // This will be used for collision detection below.
         this.coinGroup = this.add.group(this.coins);
 
         this.mushroomGroup = this.add.group(this.mushrooms);
+        this.saplingGroup = this.add.group(this.sapling);
 
         // set up player avatar
         my.sprite.player = this.physics.add.sprite(30, 345, "platformer_characters", "tile_0004.png");
@@ -111,16 +117,27 @@ class Platformer extends Phaser.Scene {
         this.physics.add.overlap(my.sprite.player, this.coinGroup, (obj1, obj2) => {
             obj2.destroy(); // remove coin on overlap
             this.coinsCollected += 1; // increment coins collected
-            this.coinText.setText('Coins: ' + this.coinsCollected); // update coin text
+            //this.coinText.setText('Coins: ' + this.coinsCollected); // update coin text
             this.collectSound.play();
         });
 
+        // Handle collision detection with mushrooms
         this.physics.add.overlap(my.sprite.player, this.mushroomGroup, (obj1, obj2) => {
             obj2.destroy();  // Remove the mushroom from the game
             this.mushroomsCollected += 1;  // Correctly increment the count
-            this.mushroomText.setText('Mushrooms: ' + this.mushroomsCollected);  // Update the display text
+            //this.mushroomText.setText('Mushrooms: ' + this.mushroomsCollected);  // Update the display text
             this.collectSound.play();
-            if (this.mushroomsCollected >= 3) {  // Check if all 3 mushrooms have been collected
+            if (this.mushroomsCollected >=  3 && this.saplingsCollected >= 3 ) {  // Check if all 3 mushrooms and sapling have been collected
+                this.winGame();  // Trigger the win condition
+            }
+        });
+
+        this.physics.add.overlap(my.sprite.player, this.saplingGroup, (obj1, obj2) => {
+            obj2.destroy(); // remove coin on overlap
+            this.saplingsCollected += 1; // increment coins collected
+            //this.coinText.setText('Coins: ' + this.coinsCollected); // update coin text
+            this.collectSound.play();
+            if (this.mushroomsCollected >=  3 && this.saplingsCollected >= 3 ) {  // Check if all 3 mushrooms and sapling have been collected
                 this.winGame();  // Trigger the win condition
             }
         });
@@ -136,14 +153,11 @@ class Platformer extends Phaser.Scene {
             this.physics.world.debugGraphic.clear()
         }, this);
 
-        // TODO: Add movement vfx here
+        // TODO: Add movement vfx here, particles
         my.vfx.walking = this.add.particles(0, 0, "kenny-particles", {
             frame: ['smoke_01.png', 'smoke_09.png'],
-            // TODO: Try: add random: true
             scale: {start: 0.02, end: 0.04},
-            // TODO: Try: maxAliveParticles: 8,
             lifespan: 350,
-            // TODO: Try: gravityY: -400,
             alpha: {start: 1, end: 0.1}, 
         });
 
@@ -158,14 +172,7 @@ class Platformer extends Phaser.Scene {
 
     winGame() {
         // Display win message and restart game option
-        let winText = this.add.text(this.cameras.main.centerX - 150, this.cameras.main.centerY - 170, 'You Win! Press R to Restart', {
-            fontSize: '25px',
-            fill: '#00FF01'
-        }).setOrigin(0.5);
-
-        this.rKey.on('down', () => {
-            this.scene.restart();
-        });
+        this.scene.start('WinScene');
     }
 
     gameOver(player, enemy) {
@@ -182,10 +189,6 @@ class Platformer extends Phaser.Scene {
 
     update() {
 
-        if (this.enemy.x >= 1000 || this.enemy.x <= 800) {
-            this.enemy.setVelocityX(-this.enemy.body.velocity.x);
-        }
-        
         if(cursors.left.isDown) {
             my.sprite.player.setAccelerationX(-this.ACCELERATION);
             my.sprite.player.resetFlip();
