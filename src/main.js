@@ -1,3 +1,5 @@
+"use strict"
+
 // game config
 let config = {
     parent: 'phaser-game',
@@ -5,13 +7,24 @@ let config = {
     render: {
         pixelArt: true  // prevent pixel art from getting blurred when scaled
     },
-    width: 900,
-    height: 600,
-    scene: [load]
+    physics: {
+        default: 'arcade',
+        arcade: {
+            debug: true,
+            gravity: {
+                x: 0,
+                y: 0
+            }
+        }
+    },
+    width: 1200,
+    height: 800,
+    backgroundColor: '#F0FFFF',
+    scene: [Load, Platformer]
 }
 
 var cursors;
 const SCALE = 2.0;
-var my = {sprite: {}};
+var my = {sprite: {}, text: {}, vfx: {}};
 
 const game = new Phaser.Game(config);
