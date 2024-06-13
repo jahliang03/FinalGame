@@ -35,11 +35,12 @@ class Platformer extends Phaser.Scene {
        
         // Create a layer
         this.groundLayer = this.map.createLayer("Ground-n-Platforms", this.tileset, 0, 0);
-    
+        this.waterLayer = this.map.createLayer("Water", this.tileset, 0,0);
         // Make it collidable
-        this.groundLayer.setCollisionByProperty({
-            collides: true
-        });
+        this.groundLayer.setCollisionByProperty({ collides: true});
+
+        // Water tiles have a property `water` set to true
+        this.waterLayer.setCollisionByProperty({ water: true });
 
         // Find coins in the "Objects" layer in Phaser
         this.coinsCollected = 0; 
@@ -151,7 +152,7 @@ class Platformer extends Phaser.Scene {
             this.physics.world.debugGraphic.clear()
         }, this);
 
-        // TODO: Add movement vfx here, particles
+        // Add movement vfx here, particles
         my.vfx.walking = this.add.particles(0, 0, "kenny-particles", {
             frame: ['smoke_01.png', 'smoke_09.png'],
             scale: {start: 0.02, end: 0.04},
@@ -173,17 +174,17 @@ class Platformer extends Phaser.Scene {
         this.scene.start('WinScene');
     }
 
-    gameOver(player, enemy) {
-        this.physics.pause(); // Stops all physics activity
-        player.setTint(0xff0000); // Change player color to red on game over
-        let gameOverText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, 'Game Over! Press R to Restart', {
-            fontSize: '32px',
-            fill: '#FF0000'
-        }).setOrigin(0.5);
-        this.rKey.on('down', () => {
-            this.scene.restart(); // Restart the scene
-        });
-    }    
+    handleWaterCollision(player, waterTile) {
+        // If the player touches water, trigger game over or restart the scene
+        this.gameOver();  // Assuming you have a gameOver method to handle this
+    }
+    
+    gameOver() {
+        // Here you can define what happens when the game is over
+        this.physics.pause();
+        this.add.text(100, 100, 'Game Over! Avoid Freezing!', { fontSize: '30px', fill: '#FF0000' });
+        this.scene.restart();
+    }
 
     update() {
 
@@ -236,7 +237,7 @@ class Platformer extends Phaser.Scene {
         if(Phaser.Input.Keyboard.JustDown(this.rKey)) {
             this.scene.restart();
         }
-        
+
         // Check if the enemy has reached the defined boundaries
         if (this.enemy.x >= this.enemy.maxX || this.enemy.x <= this.enemy.minX) {
             this.enemy.setVelocityX(-this.enemy.body.velocity.x); // Reverse the movement direction
