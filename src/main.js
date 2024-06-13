@@ -19,7 +19,7 @@ let config = {
     },
     width: 1000,
     height: 700,
-    backgroundColor: '#9BF0FF',
+    backgroundColor: '#B2E1FF',
     scene: [TitleScene, Load, Platformer, WinScene]
 }
 

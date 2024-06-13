@@ -29,7 +29,7 @@ class TitleScene extends Phaser.Scene {
         this.instructions = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY + 180, 'instructions');
         this.instructions.setScale(0.5);
 
-        this.credits = this.add.image(this.cameras.main.centerX - 240, this.cameras.main.centerY + 320, 'credits');
+        this.credits = this.add.image(this.cameras.main.centerX - 230, this.cameras.main.centerY + 310, 'credits');
         this.credits.setScale(0.4);
         // Start the game when the start button is clicked
         this.startButton.on('pointerdown', () => {

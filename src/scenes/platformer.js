@@ -29,9 +29,8 @@ class Platformer extends Phaser.Scene {
         this.collectSound = this.sound.add('collectSound', { volume: 0.5 });
         this.backgroundMusic = this.sound.add('backgroundMusic', { volume: 0.3 });
         this.backgroundMusic.play(); 
-        // Add a tileset to the map
-        // First parameter: name we gave the tileset in Tiled
-        // Second parameter: key for the tilesheet (from this.load.image in Load.js)
+    
+        // key for the tilesheet (from this.load.image in Load.js)
         this.tileset = this.map.addTilesetImage("kenny_tilemap_packed", "tilemap_tiles");
        
         // Create a layer
@@ -42,7 +41,6 @@ class Platformer extends Phaser.Scene {
             collides: true
         });
 
-        // TODO: Add createFromObjects here
         // Find coins in the "Objects" layer in Phaser
         this.coinsCollected = 0; 
         this.mushroomsCollected = 0; 
@@ -105,7 +103,7 @@ class Platformer extends Phaser.Scene {
         this.saplingGroup = this.add.group(this.sapling);
 
         // set up player avatar
-        my.sprite.player = this.physics.add.sprite(30, 345, "platformer_characters", "tile_0004.png");
+        my.sprite.player = this.physics.add.sprite(30, 345, "platformer_characters", "tile_0003.png");
         my.sprite.player.setCollideWorldBounds(true);
 
         // Enable collision handling
@@ -238,7 +236,7 @@ class Platformer extends Phaser.Scene {
         if(Phaser.Input.Keyboard.JustDown(this.rKey)) {
             this.scene.restart();
         }
-
+        
         // Check if the enemy has reached the defined boundaries
         if (this.enemy.x >= this.enemy.maxX || this.enemy.x <= this.enemy.minX) {
             this.enemy.setVelocityX(-this.enemy.body.velocity.x); // Reverse the movement direction
