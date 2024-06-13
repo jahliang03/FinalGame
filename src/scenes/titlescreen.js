@@ -10,7 +10,7 @@ class TitleScene extends Phaser.Scene {
         this.load.image('startButton', 'assets/clover_button.png'); // Adjust the path to your image file
         // Load the text 
         this.load.image('titleText', 'assets/text.png');
-        this.load.image('instructions', 'assets/instructionText.png');
+        this.load.image('instructions', 'assets/instructionsText.png');
         // Load the credits
         this.load.image('credits', 'assets/credit.png');
     }
