@@ -180,8 +180,17 @@ class Platformer extends Phaser.Scene {
     gameOver() {
         // Here you can define what happens when the game is over
         this.physics.pause();
-        this.add.text(200, 400, 'Game Over! Avoid Freezing!', { fontSize: '30px', fill: '#FF0000' });
-        this.scene.restart();
+        // Display the "Game Over" text
+        let gameOverText = this.add.text(280, 350, 'Game Over! Avoid Drowning!', {
+            fontSize: '10px',
+            fill: '#FF0000'
+        });
+
+        // Delay the scene restart for 0.5 seconds (500 milliseconds)
+        this.time.delayedCall(700, () => {
+            gameOverText.destroy(); // Optionally remove the text right before restarting
+            this.scene.restart(); // Restart the scene
+        });
     }
 
     update() {
