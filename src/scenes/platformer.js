@@ -180,7 +180,7 @@ class Platformer extends Phaser.Scene {
     gameOver() {
         // Here you can define what happens when the game is over
         this.physics.pause();
-        this.add.text(100, 100, 'Game Over! Avoid Freezing!', { fontSize: '30px', fill: '#FF0000' });
+        this.add.text(200, 400, 'Game Over! Avoid Freezing!', { fontSize: '30px', fill: '#FF0000' });
         this.scene.restart();
     }
 
