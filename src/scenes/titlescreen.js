@@ -16,6 +16,9 @@ class TitleScene extends Phaser.Scene {
     }
 
     create() {
+        //description 
+        document.getElementById('description').innerHTML = '<h2><br> Movement: left arrow (move left), right arrow (move right), up arrow (jump) <br>Collect all the mushrooms & saplings! Avoid the water!</h2>'
+        
         // Add a title text button in the center
         this.title = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY - 80, 'title');
         this.title.setScale(0.5);

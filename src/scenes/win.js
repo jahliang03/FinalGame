@@ -10,7 +10,6 @@ class WinScene extends Phaser.Scene {
         this.message = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY +20, 'winMessage');
         this.message.setScale(0.7);
 
-
         this.restart = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY + 70, 'restartMessage');
         this.restart.setScale(0.5);
         let rKey = this.input.keyboard.addKey('R');
